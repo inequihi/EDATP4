@@ -3,6 +3,7 @@
 Evento::Evento()
 {
 	type = 0;
+	keycode = 0;
 }
 
 void Evento::setType(int type)

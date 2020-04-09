@@ -5,18 +5,31 @@ Simulation::Simulation()
 	continueRunning = true;
 }
 
-void Simulation::startMoving(int keycode)
+void Simulation::startMoving(int keycode, Worm* wormArray)
 {
-	printf("START MOVING\n");
+	int i;
+	for (i = 0; i < NUMBER_OF_WORMS ; i++)
+	{
+		wormArray[i].fsm(keycode);
+	}
+	
+	//printf("START MOVING\n");
 }
 
-void Simulation::stopMoving(int keycode)
+void Simulation::stopMoving(int keycode,Worm* wormArray)
 {
-	printf("STOP MOVING\n");
+	
+	//printf("STOP MOVING\n");
 }
 
-void Simulation::refresh(void)
+void Simulation::refresh(Worm * wormArray)
 {
+	int i;
+	for (i = 0; i < NUMBER_OF_WORMS; i++)
+	{
+		wormArray[i].WormNewFrame();
+	}
+
 	printf("REFRESH\n");
 }
 

@@ -7,8 +7,8 @@
 #include "Worm.h"
 
 bool initialize(Graph** grapher, EventGen** eventgen);
-void deinit(Graph* grapher, EventGen* eventgen);
-void dispatch(Evento evento, Simulation* sim);
+void deinit(Graph** grapher, EventGen** eventgen);
+void dispatch(Evento evento, Simulation* sim, Worm* wormArray, Graph* grapher);
 
 int main(void)
 {
@@ -17,6 +17,8 @@ int main(void)
 	Simulation sim;
 	Worm worm[NUMBER_OF_WORMS];
 
+	worm[0] = Worm(ALLEGRO_KEY_UP, ALLEGRO_KEY_LEFT, ALLEGRO_KEY_RIGHT);
+	worm[1] = Worm(ALLEGRO_KEY_W, ALLEGRO_KEY_A, ALLEGRO_KEY_D);
 
 	if (!(initialize(&grapher, &eventGen)))
 	{
@@ -27,17 +29,19 @@ int main(void)
 	{
 		if (eventGen->hayEvento())
 		{
-			dispatch(eventGen->getEvento(), &sim);
+			dispatch(eventGen->getEvento(), &sim,worm, grapher);
 		}
 	}
-	deinit(grapher, eventGen);
+	deinit(&grapher, &eventGen);
 	return 0;
 }
 
 bool initialize(Graph** grapher,EventGen ** eventGen)
 {
 	*grapher = new Graph();
-	*eventGen = new EventGen();
+	if (!*grapher)
+		return false;
+	*eventGen = new EventGen((*grapher)->display);
 
 	if (!(*grapher)->wasGood() || !(*eventGen)->wasGood())
 	{
@@ -46,27 +50,38 @@ bool initialize(Graph** grapher,EventGen ** eventGen)
 	return true;
 }
 
-void deinit(Graph* grapher, EventGen* eventgen)
+void deinit(Graph** grapher, EventGen** eventgen)
 {
-	delete grapher;
-	delete eventgen;
+	delete *eventgen;
+	if (*grapher)
+	{
+		delete* grapher;
+		*grapher = NULL;
+	}
 }
 
 
-void dispatch(Evento evento, Simulation* sim)
+void dispatch(Evento evento, Simulation* sim, Worm* wormArray, Graph* grapher)
 {
 		switch (evento.getType())
 		{
 			case KEY_DOWN:
-				sim->startMoving(evento.getKey());		
+				sim->startMoving(evento.getKey(),wormArray);		
 			break;
 
 			case KEY_UP:
-				sim->stopMoving(evento.getKey());
+				sim->stopMoving(evento.getKey(),wormArray);
 			break;
 
 			case TIMER:
-				sim->refresh();				
+				sim->refresh(wormArray);	
+				int j;
+				for (j = 0; j < NUMBER_OF_WORMS; j++)
+				{
+					grapher->printState(wormArray[j].getState(),wormArray[j].getTick(), wormArray[j].getPosX(), wormArray[j].getPosY(), wormArray[j].getDireccion());
+				}
+				
+				sim->startMoving(REFRESH, wormArray);
 			break;
 
 			case CLOSE:
@@ -109,6 +124,7 @@ while(simulation.running())
 
 }
 deinit();
+
 hayEvento()
 {
 	keyboard.keycode.key 

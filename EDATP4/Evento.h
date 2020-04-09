@@ -1,4 +1,5 @@
-#pragma once
+#ifndef EVENTO_H
+#define EVENTO_H
 
 class Evento
 {
@@ -13,3 +14,4 @@ private:
 	int keycode;
 };
 
+#endif

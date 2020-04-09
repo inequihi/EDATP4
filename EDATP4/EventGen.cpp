@@ -1,6 +1,6 @@
 #include "EventGen.h"
 
-EventGen::EventGen()
+EventGen::EventGen(ALLEGRO_DISPLAY* display)
 {
 	event_queue = NULL;
 	timer = NULL;
@@ -14,8 +14,10 @@ EventGen::EventGen()
 	}
 	else
 	{
+		al_register_event_source(event_queue, al_get_display_event_source(display));
 		al_register_event_source(event_queue, al_get_timer_event_source(timer));
 		al_register_event_source(event_queue, al_get_keyboard_event_source());
+		al_register_event_source(event_queue, al_get_mouse_event_source());
 		al_start_timer(timer);  //revisar si se pone aca o donde se pondria
 	}
 }
@@ -23,9 +25,17 @@ EventGen::EventGen()
 EventGen::~EventGen()
 {
 	if (event_queue)
-		al_destroy_event_queue(event_queue);	
+	{
+		al_destroy_event_queue(event_queue);
+		event_queue = NULL;
+	}
+		
 	if (timer)
-		al_destroy_timer(timer);				
+	{
+		al_destroy_timer(timer);
+		timer = NULL;
+	}
+				
 }
 
 bool EventGen::hayEvento()

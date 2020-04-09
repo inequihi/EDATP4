@@ -1,15 +1,19 @@
 #ifndef WORM_H
-
 #define WORM_H
 
 #include "Prototypes.h"
+#include "Graph.h"
+
+#define LEFT -1
+#define RIGHT 1
+#define PI 3.14159265
 
 typedef struct
 {
 	double x;
 	double y;
-	double dx;
-	double dy;
+	double dxdt;		//velocidad
+	double dxdtdt;			//aceleracion
 
 }position_t;
 
@@ -24,8 +28,7 @@ typedef struct
 }STATE;
 
 enum States {STILL, JUMPING, WALKING, PREMOVE, LANDING, MAXSTATES};
-enum Keys {KEYJUMP, KEYLEFT, KEYRIGHT, NOKEY, FIN};
-
+enum Keys {KEYJUMP, KEYLEFT, KEYRIGHT, REFRESH, NOKEY=-1};
 
 class Worm
 {
@@ -33,20 +36,32 @@ public:
 	Worm();
 	Worm(char, char, char);
 	void WormJump();
-	void WormLanding();
 	void WormWalk();
 	void WormPreWalk();
-	void nothing2do();
 	void WormNewFrame();
 	void WormStop();
+	void fsm(int newevent);
+	int turn_keycode_to_key(int keycode);
+	bool check4motion(void);
 
-	//Privadas ya que nadie heredara de worm
+	/****************
+	*   getters		*
+	*****************/
+	unsigned int getState(void);
+	unsigned int getTick(void);
+	double getPosX(void);
+	double getPosY(void);
+	int getDireccion(void);
+
+protected:
 	unsigned int state;
 	unsigned int prevState;
 	char keyJump;
 	char keyLeft;
 	char keyRight;
+	unsigned int wormDir;
 	position_t pos;
+	unsigned int ticks;
 
 };
 
@@ -63,9 +78,9 @@ public:
 		{	{KEYJUMP,JUMPING,WormJump},
 			{KEYLEFT,PREMOVE,this->WormPreWalk},
 			{KEYRIGHT,PREMOVE,&(this->WormPreWalk)},
-			{NOKEY, PREMOVE, &(WormNewFrame)},
+			{NOKEY, STILL, &(WormNewFrame)},
 
-			{FIN, PREMOVE, WormNewFrame} //sigue en mismo estado solo actualiza el frame
+			{FIN, STILL, WormNewFrame} //sigue en mismo estado solo actualiza el frame
 		}
 		//state: JUMPING
 		{	{KEYJUMP,JUMPING,WormJump},

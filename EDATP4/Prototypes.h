@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PROTOTYPES_H
+#define PROTOTYPES_H
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -13,3 +14,5 @@
 #define FPS	50
 
 enum types { KEY_DOWN = 1, KEY_UP, TIMER, CLOSE };
+
+#endif //PROTOTYPES_H

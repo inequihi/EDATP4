@@ -1,4 +1,6 @@
-#pragma once
+#ifndef EVENTGEN_H
+#define EVENTGEN_H
+
 #include<stdio.h>
 #include <allegro5/allegro.h>
 #include "Evento.h"
@@ -7,7 +9,7 @@
 class EventGen
 {
 public:
-	EventGen();
+	EventGen(ALLEGRO_DISPLAY* display);
 	~EventGen();
 	bool hayEvento(void);
 	Evento getEvento(void);
@@ -24,3 +26,4 @@ private:
 	bool ev_ok;
 };
 
+#endif  //EVENTOGEN_H

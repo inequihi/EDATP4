@@ -1,26 +1,38 @@
-#pragma once
+#ifndef GRAPH_H
+#define GRAPH_H
+
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h>
+#include <allegro5/allegro_primitives.h>
 #include "Prototypes.h"
 #include <string>
 
+
 using namespace std;
+enum graphStates { STILL_G, JUMPING_G, WALKING_G, PREMOVE_G, LANDING_G, MAXSTATES_G };
 
 class Graph
 {
 public:
 	Graph();
-	~Graph();
+	void destroy(void);
 	bool wasGood(void);
 	bool AllegroInit(void);
-private:
+	void printState(int state_flag, int tick, double pos_X, double pos_Y, int direccion);
 	ALLEGRO_DISPLAY* display;
+
+protected:
+	
 	ALLEGRO_EVENT_QUEUE* eventqueue;
 	ALLEGRO_BITMAP* background;
-	ALLEGRO_BITMAP* imJump[CANT_IMAGES_JUMP+1];
-	ALLEGRO_BITMAP* imWalk[CANT_IMAGES_JUMP + 1];
+	ALLEGRO_BITMAP* imJump[CANT_IMAGES_JUMP+10];
+	ALLEGRO_BITMAP* imWalk[CANT_IMAGES_JUMP + 10];
 	bool all_ok;
 	bool createDisplay(void);
 	bool loadImages(void);
+
+private:
+	int checkOrientacion(int direccion);
 };
 
+#endif //GRAPH_H
