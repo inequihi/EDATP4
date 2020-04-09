@@ -57,4 +57,12 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="Scenario.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="jardin.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
 </Project>

@@ -1,4 +1,7 @@
 #pragma once
+
+#include <stdio.h>	///Incluyo solo para debug
+
 class Simulation
 {
 public:

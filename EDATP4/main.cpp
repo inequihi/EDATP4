@@ -6,8 +6,6 @@
 #include "Graph.h"
 #include "Worm.h"
 
-using namespace std;
-
 bool initialize(Graph** grapher, EventGen** eventgen);
 void deinit(Graph* grapher, EventGen* eventgen);
 void dispatch(Evento evento, Simulation* sim);
@@ -15,32 +13,33 @@ void dispatch(Evento evento, Simulation* sim);
 int main(void)
 {
 	Graph* grapher = NULL;
-	EventGen* eventgen = NULL;
+	EventGen* eventGen = NULL;
 	Simulation sim;
 	Worm worm[NUMBER_OF_WORMS];
 
 
-	if (!initialize(&grapher, &eventgen))
+	if (!(initialize(&grapher, &eventGen)))
 	{
 		printf("Error de inicializacion");
 		return -1;
 	}
 	while (sim.running())
 	{
-		if ((*eventgen).hayEvento())
+		if (eventGen->hayEvento())
 		{
-			dispatch((*eventgen).getEvento(), &sim);
+			dispatch(eventGen->getEvento(), &sim);
 		}
 	}
-	deinit(grapher, eventgen);
+	deinit(grapher, eventGen);
 	return 0;
 }
 
-bool initialize(Graph** grapher,EventGen ** eventgen)
+bool initialize(Graph** grapher,EventGen ** eventGen)
 {
 	*grapher = new Graph();
-	*eventgen = new EventGen();
-	if (!(*(*grapher)).wasGood() || !(*(*eventgen)).wasGood())
+	*eventGen = new EventGen();
+
+	if (!(*grapher)->wasGood() || !(*eventGen)->wasGood())
 	{
 		return false;
 	}
@@ -110,16 +109,17 @@ while(simulation.running())
 
 }
 deinit();
-
 hayEvento()
 {
+	keyboard.keycode.key 
+
 	return al_getNextEvent(&event.eventQueue);
 }
 
 dispatch()
 {
 	switch(evento)
-	case AL_KEY_DOWN:
+	case AL_KEY_DOWN :
 		simulate.StartMoving(evento.getkey());		//clase evento
 		break;
 
@@ -156,9 +156,9 @@ Simulation::startMoving(int )
 que worm herede de clase graphic.
 
 CLASES:
-	-EVENTO
-	-GRAFICA	
+	EVENTO 
+	-GRAFICA [ine]	
 	-WORMS	//arma mini fsm. usa funciones de grafica dependiendo de su estado anterior y timer
-	-SIMULAITION
+	-SIMULAITION [bren]
 
 */

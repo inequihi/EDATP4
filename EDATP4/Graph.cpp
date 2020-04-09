@@ -5,6 +5,7 @@ Graph::Graph()
 	display = NULL;
 	eventqueue = NULL;
 	all_ok = true;
+	
 	if (!AllegroInit())
 	{
 		all_ok = false;
@@ -17,6 +18,7 @@ Graph::~Graph()
 		al_destroy_display(display);	
 	if (background)
 		al_destroy_bitmap(background);	
+	al_uninstall_keyboard();
 }
 
 bool Graph::wasGood(void)
@@ -27,23 +29,33 @@ bool Graph::wasGood(void)
 
 bool Graph::AllegroInit()
 {
-	if(!al_init())
+	if(al_init())
 	{
-		return false;
-	}
-	if (!al_init_image_addon())
-	{
-		return false;
-	}
-	if (!createDisplay() || !loadImages()) 
-	{
-		return false;
-	}
-	if (!al_install_mouse())
-	{
-		return false;
-	}
-	return true;
+		if (al_init_image_addon())
+		{
+			if (createDisplay())
+			{
+				if (loadImages())
+				{
+					if (al_install_mouse())
+					{
+						if (al_install_keyboard())
+						{
+							return true;
+						}else
+							printf("ERROR al_instal_keyboard\n");
+					}else
+						printf("ERROR al_install_mouse\n");
+				}else
+					printf("ERROR load Images\n");
+			}else
+				printf("ERROR create display\n");
+		}else
+			printf("ERROR al_init_image_addon\n");
+	}else
+		printf("ERROR al_init\n");
+	return false;
+
 }
 
 bool Graph::createDisplay(void)
@@ -57,8 +69,12 @@ bool Graph::createDisplay(void)
 bool Graph::loadImages(void)
 {
 	//Cargamos el fondo
-	if (!(background = al_load_bitmap("Scenario.png")))
+	if (!(background = al_load_bitmap("jardin.jpg")))
+	{
+		printf("ERROR loading background");
 		return false;
+	}
+	al_draw_bitmap(background, 0, 0, 0);
 
 	//Cargamos las imagenes de salto
 	string str = "wjump\\wjump-F";
@@ -69,6 +85,7 @@ bool Graph::loadImages(void)
 		imJump[i] = al_load_bitmap(direccion.c_str());
 		if (!imJump[i])
 		{
+			printf("ERROR loading jumping bitmaps\n");
 			return false;
 		}
 	}
@@ -82,8 +99,10 @@ bool Graph::loadImages(void)
 		imWalk[i] = al_load_bitmap(completeDireccion.c_str());
 		if (!imWalk[i])
 		{
+			printf("ERROR loading moving bitmap");
 			return false;
 		}
 	}
+	al_flip_display();
 	return true;
 }
