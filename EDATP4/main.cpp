@@ -1,3 +1,102 @@
+#include <stdio.h>
+#include <iostream>
+#include "Prototypes.h"
+#include "EventGen.h"
+#include "Simulation.h"
+#include "Graph.h"
+#include "Worm.h"
+
+using namespace std;
+
+bool initialize(Graph** grapher, EventGen** eventgen);
+void deinit(Graph* grapher, EventGen* eventgen);
+void dispatch(Evento evento, Simulation* sim);
+
+int main(void)
+{
+	Graph* grapher = NULL;
+	EventGen* eventgen = NULL;
+	Simulation sim;
+	Worm worm[NUMBER_OF_WORMS];
+
+
+	if (!initialize(&grapher, &eventgen))
+	{
+		printf("Error de inicializacion");
+		return -1;
+	}
+	while (sim.running())
+	{
+		if ((*eventgen).hayEvento())
+		{
+			dispatch((*eventgen).getEvento(), &sim);
+		}
+	}
+	deinit(grapher, eventgen);
+	return 0;
+}
+
+bool initialize(Graph** grapher,EventGen ** eventgen)
+{
+	*grapher = new Graph();
+	*eventgen = new EventGen();
+	if (!(*(*grapher)).wasGood() || !(*(*eventgen)).wasGood())
+	{
+		return false;
+	}
+	return true;
+}
+
+void deinit(Graph* grapher, EventGen* eventgen)
+{
+	delete grapher;
+	delete eventgen;
+}
+
+
+void dispatch(Evento evento, Simulation* sim)
+{
+		switch (evento.getType())
+		{
+			case KEY_DOWN:
+				sim->startMoving(evento.getKey());		
+			break;
+
+			case KEY_UP:
+				sim->stopMoving(evento.getKey());
+			break;
+
+			case TIMER:
+				sim->refresh();				
+			break;
+
+			case CLOSE:
+				sim->quit();
+			break;
+		}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /*notas de la clase*/
 
 /*
