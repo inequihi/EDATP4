@@ -25,8 +25,8 @@ protected:
 	
 	ALLEGRO_EVENT_QUEUE* eventqueue;
 	ALLEGRO_BITMAP* background;
-	ALLEGRO_BITMAP* imJump[CANT_IMAGES_JUMP+10];
-	ALLEGRO_BITMAP* imWalk[CANT_IMAGES_JUMP + 10];
+	ALLEGRO_BITMAP* imJump[CANT_IMAGES_JUMP];
+	ALLEGRO_BITMAP* imWalk[CANT_IMAGES_WALK];
 	bool all_ok;
 	bool createDisplay(void);
 	bool loadImages(void);
