@@ -48,9 +48,8 @@ public:
 	char keyRight;
 	position_t pos;
 
+};
 
-
-}
 #endif
 
 
