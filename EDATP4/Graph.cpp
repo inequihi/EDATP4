@@ -89,7 +89,7 @@ bool Graph::loadImages(void)
 	//Cargamos las imagenes de salto
 	string str = "wjump\\wjump-F";
 	string direccion;
-	for (int i = 1; i < CANT_IMAGES_JUMP; i++)
+	for (int i = 0; i < CANT_IMAGES_JUMP; i++)
 	{
 		direccion = str + to_string(i+1) + ".png";
 		imJump[i] = al_load_bitmap(direccion.c_str());
@@ -103,7 +103,7 @@ bool Graph::loadImages(void)
 	//Cargamos las imagenes de caminata
 	string direct = "wwalking\\wwalk-F";
 	string completeDireccion;
-	for (int i = 1; i < CANT_IMAGES_WALK; i++)
+	for (int i = 0; i < CANT_IMAGES_WALK; i++)
 	{
 		completeDireccion = direct + to_string(i+1) + ".png";
 		imWalk[i] = al_load_bitmap(completeDireccion.c_str());
@@ -141,6 +141,7 @@ void Graph::printState(int state_flag, int tick, double pos_X, double pos_Y, int
 	default:
 		break;
 	}
+	al_flip_display();
 }
 
 int Graph::checkOrientacion(int direccion)
