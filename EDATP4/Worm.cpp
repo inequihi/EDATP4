@@ -8,10 +8,10 @@ Worm::Worm()
 	pos.y = 0;
 	pos.dxdt = 0;
 	pos.dxdtdt = 0;
+	pos.wormDir = 0;
 	keyJump = '0';
 	keyLeft = '0';
 	keyRight = '0';
-	wormDir = 1;
 	ticks = 0;
 	preWalkticks = 0;
 	iveBeenWalking4 = 0;
@@ -26,9 +26,9 @@ Worm::Worm(char keyJump_, char keyLeft_, char keyRight_)
 	keyRight = keyRight_;
 	pos.dxdt = 27;			//Se mueve de a 27 pixeles por segundo 
 	pos.dxdtdt = 0.24;
+	pos.wormDir = 0;
 	state = STILL;
 	prevState = STILL;
-	wormDir = 1;
 	ticks = 0;
 	preWalkticks= 0; 
 	iveBeenWalking4 = 0;
@@ -42,7 +42,7 @@ unsigned int Worm::getState(void) { return state; }
 unsigned int Worm::getTick(void) { return ticks; }
 double Worm::getPosX(void) {return pos.x;}
 double Worm::getPosY(void) { return pos.y; }
-int Worm::getDireccion(void) { return wormDir; }
+int Worm::getDireccion(void) { return pos.wormDir; }
 
 void Worm::fsm(int keycode, int UP_OR_DOWN)
 {
@@ -61,7 +61,17 @@ void Worm::fsm(int keycode, int UP_OR_DOWN)
 
 			}
 			else if (key_evento == KEYLEFT || key_evento == KEYRIGHT)
+			{
+				if (key_evento == KEYLEFT)
+				{
+					this->pos.wormDir = LEFT;
+				}
+				else if (key_evento == KEYRIGHT)
+				{
+					this->pos.wormDir = RIGHT;
+				}
 				WormPreWalk();				//en preWalk set timer to 0 y camibio a estado premove
+			}
 			else if(key_evento == REFRESH)
 				this->ticks = 0;		//Nada se mueve
 			break;
@@ -84,7 +94,8 @@ void Worm::fsm(int keycode, int UP_OR_DOWN)
 			else if (key_evento == REFRESH || key_evento == KEYLEFT || key_evento == KEYRIGHT)
 			{
 				printf("PRE WALK\n");
-				if (this->preWalkticks >= 5)				//Cada tick vale 0,02 segundos --> 5 ticks son 0,1 segundos
+
+				if (this->preWalkticks >= 4)				//Cada tick vale 0,02 segundos --> 5 ticks son 0,1 segundos (ticks empiezan en 0)
 				{
 					this->state = WALKING;
 					this->ticks = 0;
@@ -136,6 +147,7 @@ void Worm::fsm(int keycode, int UP_OR_DOWN)
 				if (this->iveBeenWalking4 < 45)					//Si se levanto antes de los 0.9 milisegundos
 				{
 					this->state = STILL;			//vuelve a estar quieto
+					//this->pos.wormDir = 0;				SIGO CON LA MISMA DIRECCION Q ANTES?
 				}
 				if (this->iveBeenWalking4 > 45)
 				{
@@ -150,9 +162,10 @@ void Worm::fsm(int keycode, int UP_OR_DOWN)
 			{
 				this->preWalkticks = 0;			//descarto la cantidad de ticks q espere
 				this->state = STILL;				//vuelvo a estar quieta
-				if ((this->wormDir == LEFT && key_evento == KEYRIGHT) || (this->wormDir == RIGHT && key_evento == KEYLEFT))
+				//this->pos.wormDir = 0;			//SIGO CON LA MISMA DIRECCION QUE ANTEs?
+				if ((this->pos.wormDir == LEFT && key_evento == KEYRIGHT) || (this->pos.wormDir == RIGHT && key_evento == KEYLEFT))
 				{
-					this->wormDir *= -1;   //Lo roto
+					this->pos.wormDir *= -1;   //Lo roto
 				}
 			}
 			break;
@@ -185,23 +198,24 @@ void Worm::WormJump() //Update caida no importa si estaempezando a saltar o cont
 	if (this->ticks >= 0 && this->ticks < CANT_IMAGES_JUMP)
 	{
 		state = JUMPING;
-		if (check4motion())		//si esta en el borde da la vuelta en el aire (nose)
+		if (check4motion())		//si esta en el borde salta para arriba  o cae
 		{
-			this->wormDir *= -1;
+			this->pos.wormDir = 0;
 		}
 
-		this->pos.x += this->wormDir * cos(PI / 3)* pos.dxdt * this->ticks;			//4,5 es la velocidad de salto
+		this->pos.x += this->pos.wormDir * cos(PI / 3)* pos.dxdt * this->ticks;			//4,5 es la velocidad de salto
 			
-		if (this->pos.y < MIN_POSITION_Y)		//Eje en alegro es alreves por eso si es mas chico q base esta saltando
+		if (this->pos.y <= MIN_POSITION_Y)		//Eje en alegro es alreves por eso si es mas chico q base esta saltando
 		{
-			this->pos.y = MIN_POSITION_Y + this->pos.dxdt * ticks - this->pos.dxdtdt * 0.5 * this->ticks * this->ticks;
+			this->pos.y = MIN_POSITION_Y - this->pos.dxdt * ticks - this->pos.dxdtdt * 0.5 * this->ticks * this->ticks;
 		}
 
-		printf("JUMP, tick:%u\n",this->ticks);
+		printf("JUMP, tick:%u, y:%f \n",this->ticks, this->pos.y);
 	}
 	else  //Back to still
 	{
 		this->pos.y = MIN_POSITION_Y;
+	//	this->pos.wormDir = 0;					DESPUES DE SALTAR DEBERIA TENER MISMA DIRECCION QUE ANTES/DURANTE SALTO? O
 		this->ticks = 0;
 		this->state = STILL;
 		this->pos.dxdt = 27;
@@ -211,10 +225,10 @@ void Worm::WormJump() //Update caida no importa si estaempezando a saltar o cont
 
 bool Worm::check4motion()
 {
-	bool isOk = false;			//Si es false NO tenemos q voltear a worm
-	if ((this->wormDir == RIGHT) && (this->pos.x > MAX_POSITION_X))
+	bool isOk = false;			//Si devuelve false NO tenemos q voltear a worm
+	if (this->pos.wormDir == RIGHT && this->pos.x > MAX_POSITION_X)
 		isOk = true;
-	if ((this->wormDir == LEFT) && (this->pos.x < MIN_POSITION_X))
+	else if (this->pos.wormDir == LEFT && this->pos.x < MIN_POSITION_X)
 		isOk = true;
 	
 	return isOk;
@@ -224,7 +238,7 @@ void Worm::WormWalk()			//Aca verificar si tengo q cambiar sentido de direccion 
 {
 	if (check4motion())
 	{
-		this->wormDir *= -1;
+		this->pos.wormDir *= -1;
 	}
 
 	if (this->ticks >= (CANT_IMAGES_WALK-1))
@@ -232,12 +246,12 @@ void Worm::WormWalk()			//Aca verificar si tengo q cambiar sentido de direccion 
 		this->ticks = 0;
 	}
 
-	this->pos.x += this->wormDir * this->pos.dxdt;
+	this->pos.x += this->pos.wormDir * this->pos.dxdt;
 
-	printf("WALK, ticks:%u\n",this->ticks);
+	printf("WALK, ticks:%u, %f\n",this->ticks, this->pos.x);
 	this->iveBeenWalking4 += 1;
-
 }
+
 void Worm::WormPreWalk()
 {
 	this->state = PREMOVE;

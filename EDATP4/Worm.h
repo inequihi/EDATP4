@@ -14,18 +14,11 @@ typedef struct
 	double y;
 	double dxdt;		//velocidad
 	double dxdtdt;			//aceleracion
-
+	int wormDir;				//direccion
 }position_t;
 
 typedef unsigned int EVENTO;
 typedef unsigned int ESTADO;
-
-typedef struct
-{
-	EVENTO evento;
-	ESTADO proximoEstado;
-	void(*p_rut_accion)(void);
-}STATE;
 
 enum States {STILL, JUMPING, WALKING, PREMOVE, LANDING, MAXSTATES};
 enum Keys {KEYJUMP, KEYLEFT, KEYRIGHT, REFRESH, NOKEY=-1};
@@ -61,7 +54,6 @@ protected:
 	char keyJump;
 	char keyLeft;
 	char keyRight;
-	unsigned int wormDir;
 	position_t pos;
 	unsigned int ticks;
 	unsigned int preWalkticks; 
