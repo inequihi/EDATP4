@@ -135,19 +135,12 @@ void Worm::fsm(int keycode, int UP_OR_DOWN)
 	{
 		switch (this->state)
 		{
-		/*
-		case STILL:     -> No afecta en nada ?
-			break;  */ 
-		/*
-		case JUMPING:	->No afecta en nada ?
-			break;	*/
 		case WALKING:
 			if (key_evento == KEYLEFT || key_evento == KEYRIGHT)	 //Si estoy en walking solo me importa si se movieron estas dos teclas
 			{
 				if (this->iveBeenWalking4 < 45)					//Si se levanto antes de los 0.9 milisegundos
 				{
-					this->state = STILL;			//vuelve a estar quieto
-					//this->pos.wormDir = 0;				SIGO CON LA MISMA DIRECCION Q ANTES?
+					this->state = STILL;			//vuelve a estar quieto con la misma direccion q antes
 				}
 				if (this->iveBeenWalking4 > 45)
 				{
@@ -161,8 +154,7 @@ void Worm::fsm(int keycode, int UP_OR_DOWN)
 			if (key_evento == KEYLEFT || key_evento == KEYRIGHT)	//Si estoy en prewalk solo me importa si se movieron estas dos teclas
 			{
 				this->preWalkticks = 0;			//descarto la cantidad de ticks q espere
-				this->state = STILL;				//vuelvo a estar quieta
-				//this->pos.wormDir = 0;			//SIGO CON LA MISMA DIRECCION QUE ANTEs?
+				this->state = STILL;				//vuelvo a estar quieta con la misma direccion que antes
 				if ((this->pos.wormDir == LEFT && key_evento == KEYRIGHT) || (this->pos.wormDir == RIGHT && key_evento == KEYLEFT))
 				{
 					this->pos.wormDir *= -1;   //Lo roto
@@ -215,7 +207,6 @@ void Worm::WormJump() //Update caida no importa si estaempezando a saltar o cont
 	else  //Back to still
 	{
 		this->pos.y = MIN_POSITION_Y;
-	//	this->pos.wormDir = 0;					DESPUES DE SALTAR DEBERIA TENER MISMA DIRECCION QUE ANTES/DURANTE SALTO? O
 		this->ticks = 0;
 		this->state = STILL;
 		this->pos.dxdt = 27;
@@ -266,8 +257,7 @@ void Worm::WormNewFrame()
 	{
 		this->preWalkticks += 1; 
 	}
-
-	this->ticks+= 1;				//NO ESTOY SEGURA SI ESTO ES LO QUE HACE REFRESH;
+	this->ticks+= 1;				
 }
 
 void Worm::WormStop()
