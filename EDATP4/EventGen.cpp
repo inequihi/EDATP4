@@ -18,7 +18,6 @@ EventGen::EventGen(ALLEGRO_DISPLAY* display)
 		al_register_event_source(event_queue, al_get_display_event_source(display));
 		al_register_event_source(event_queue, al_get_timer_event_source(timer));
 		al_register_event_source(event_queue, al_get_keyboard_event_source());
-		al_register_event_source(event_queue, al_get_mouse_event_source());
 		al_start_timer(timer);  //revisar si se pone aca o donde se pondria
 	}
 }
