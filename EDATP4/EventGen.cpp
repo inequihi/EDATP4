@@ -7,6 +7,7 @@ EventGen::EventGen(ALLEGRO_DISPLAY* display)
 	ev_ok = true;
 	event_queue = al_create_event_queue();
 	timer = al_create_timer(1.0 / FPS);
+
 	if (!event_queue || !timer)				//elimino !al_install_keyboard() de la ocndicion para q esto se haga en graph class init
 	{
 		ev_ok = false;

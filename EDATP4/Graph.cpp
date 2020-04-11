@@ -79,7 +79,7 @@ bool Graph::createDisplay(void)
 bool Graph::loadImages(void)
 {
 	//Cargamos el fondo
-	if (!(background = al_load_bitmap("Scenario.png")))
+	if (!(background = al_load_bitmap("jardin.jpg")))
 	{
 		printf("ERROR loading background");
 		return false;
@@ -120,11 +120,10 @@ bool Graph::loadImages(void)
 void Graph::printState(int state_flag, int tick, double pos_X, double pos_Y, int direccion)
 {
 	int flag = checkOrientacion(direccion);
-
 	switch (state_flag)
 	{
 	case STILL_G:
-		al_draw_bitmap(imWalk[0], pos_X, pos_Y, flag);			//si esta quieto tick seria cero
+		al_draw_bitmap(imWalk[tick], pos_X, pos_Y, flag);			//si esta quieto tick seria cero
 		break;
 
 	case JUMPING_G:
@@ -136,12 +135,12 @@ void Graph::printState(int state_flag, int tick, double pos_X, double pos_Y, int
 		break;
 
 	case PREMOVE_G:
-		al_draw_bitmap(imWalk[0], pos_X, pos_Y, flag);			//si esta en premove tick seria cero
+		al_draw_bitmap(imWalk[tick], pos_X, pos_Y, flag);			//si esta en premove tick seria cero
 		break;
 	default:
 		break;
 	}
-	al_flip_display();
+
 }
 
 int Graph::checkOrientacion(int direccion)

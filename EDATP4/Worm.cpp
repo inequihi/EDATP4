@@ -13,6 +13,8 @@ Worm::Worm()
 	keyRight = '0';
 	wormDir = 1;
 	ticks = 0;
+	preWalkticks = 0;
+	iveBeenWalking4 = 0;
 }
 
 Worm::Worm(char keyJump_, char keyLeft_, char keyRight_)
@@ -28,6 +30,8 @@ Worm::Worm(char keyJump_, char keyLeft_, char keyRight_)
 	prevState = STILL;
 	wormDir = 1;
 	ticks = 0;
+	preWalkticks= 0; 
+	iveBeenWalking4 = 0;
 }
 
 
@@ -40,20 +44,21 @@ double Worm::getPosX(void) {return pos.x;}
 double Worm::getPosY(void) { return pos.y; }
 int Worm::getDireccion(void) { return wormDir; }
 
-void Worm::fsm(int keycode)
+void Worm::fsm(int keycode, int UP_OR_DOWN)
 {
 	EVENTO key_evento = turn_keycode_to_key(keycode);
-	if (key_evento!=-1)
+	if (key_evento!=-1 && UP_OR_DOWN == DOWN)			//En este caso tambien puede llegar a ser key refresh, ya que tomamos a este evento como un key down 
 	{
 		switch (this->state)
 		{
 		case STILL:
+			printf("STILL\n");
 			if (key_evento == KEYJUMP)
 			{
 				this->ticks = 0;
 				this->pos.dxdt = 4.5;
 				WormJump();
-				//WormNewFrame();
+
 			}
 			else if (key_evento == KEYLEFT || key_evento == KEYRIGHT)
 				WormPreWalk();				//en preWalk set timer to 0 y camibio a estado premove
@@ -66,23 +71,7 @@ void Worm::fsm(int keycode)
 			//Se ignoran todas las teclas si estamos saltando ya que hasta
 			//no aterrizar el estado de jumping no hace nada mas que saltar
 			WormJump();
-			//WormNewFrame();
-			break;
 
-		case WALKING:
-			if (key_evento == KEYJUMP)
-			{
-				this->ticks = 0;
-				this->pos.dxdt = 4.5;
-				WormJump();
-				//WormNewFrame();
-			}
-			else if (key_evento == KEYLEFT || key_evento == KEYRIGHT || key_evento == REFRESH)
-			{
-				WormWalk();					//En worm walk vemos: -si tenemos q rotar o no 
-									//-si pasaron los frames para movernos ?
-			}
-			//WormNewFrame();
 			break;
 
 		case PREMOVE:
@@ -91,18 +80,83 @@ void Worm::fsm(int keycode)
 				this->ticks = 0;
 				this->pos.dxdt = 4.5;
 				WormJump();		//Si estaba por moverse pero salto, cambio de estado a saltar
-				//WormNewFrame();
 			}
-			else if (key_evento == REFRESH)
+			else if (key_evento == REFRESH || key_evento == KEYLEFT || key_evento == KEYRIGHT)
 			{
-				if (this->ticks > 100)			//ACA IRIA TIME CONDITION CON ALLEGRO TIMER
+				printf("PRE WALK\n");
+				if (this->preWalkticks >= 5)				//Cada tick vale 0,02 segundos --> 5 ticks son 0,1 segundos
 				{
 					this->state = WALKING;
 					this->ticks = 0;
-					//SET TIMER DENUEVO A 0
+					this->preWalkticks = 0;
+				}
+
+			}
+			break;
+
+		case WALKING:
+			if (key_evento == KEYJUMP)
+			{
+				this->ticks = 0;
+				this->pos.dxdt = 4.5;
+				WormJump();
+			}
+			else if (key_evento == KEYLEFT || key_evento == KEYRIGHT || key_evento == REFRESH)
+			{
+				WormWalk();					//En worm walk vemos: -si tenemos q rotar o no 		
+				if (this->iveBeenWalking4 >= 45)			//Cada tick mientras camina incrementa en 0,02 segundos, 45 ticks son 0,9 segunods
+				{
+					this->preWalkticks += 1;			//Los ticks que cuentan tiempo para decididir si seguimos caminando o no					
+				}
+				if (iveBeenWalking4 >= 50)			//Si es mayor o igual a 1000 ms significa que ya paso el tiempo de pregunta (900ms) y ya verifico 
+				{										//si la flecha estuvo apretada el tiempo necesario para moverse (100ms)
+					this->iveBeenWalking4 = 0;											//por lo que tengo que volver a esperar 900ms
 				}
 			}
 			break;
+
+		default:
+			break;
+		}
+	}
+
+	if (key_evento != -1 && UP_OR_DOWN == UP)
+	{
+		switch (this->state)
+		{
+		/*
+		case STILL:     -> No afecta en nada ?
+			break;  */ 
+		/*
+		case JUMPING:	->No afecta en nada ?
+			break;	*/
+		case WALKING:
+			if (key_evento == KEYLEFT || key_evento == KEYRIGHT)	 //Si estoy en walking solo me importa si se movieron estas dos teclas
+			{
+				if (this->iveBeenWalking4 < 45)					//Si se levanto antes de los 0.9 milisegundos
+				{
+					this->state = STILL;			//vuelve a estar quieto
+				}
+				if (this->iveBeenWalking4 > 45)
+				{
+					WormPreWalk();
+				}
+				this->iveBeenWalking4 = 0;			//IveBeenWalking4 vuelve a cero cvuando se levanta la tecla de caminar
+			}
+			break;
+
+		case PREMOVE:
+			if (key_evento == KEYLEFT || key_evento == KEYRIGHT)	//Si estoy en prewalk solo me importa si se movieron estas dos teclas
+			{
+				this->preWalkticks = 0;			//descarto la cantidad de ticks q espere
+				this->state = STILL;				//vuelvo a estar quieta
+				if ((this->wormDir == LEFT && key_evento == KEYRIGHT) || (this->wormDir == RIGHT && key_evento == KEYLEFT))
+				{
+					this->wormDir *= -1;   //Lo roto
+				}
+			}
+			break;
+
 		default:
 			break;
 		}
@@ -131,17 +185,18 @@ void Worm::WormJump() //Update caida no importa si estaempezando a saltar o cont
 	if (this->ticks >= 0 && this->ticks < CANT_IMAGES_JUMP)
 	{
 		state = JUMPING;
-		if (!check4motion())		//si esta en el borde da la vuelta en el aire (nose)
+		if (check4motion())		//si esta en el borde da la vuelta en el aire (nose)
 		{
 			this->wormDir *= -1;
 		}
 
 		this->pos.x += this->wormDir * cos(PI / 3)* pos.dxdt * this->ticks;			//4,5 es la velocidad de salto
 			
-		if (this->pos.y <= MIN_POSITION_Y)		//Eje en alegro es alreves por eso si es mas chico q base esta saltando
+		if (this->pos.y < MIN_POSITION_Y)		//Eje en alegro es alreves por eso si es mas chico q base esta saltando
 		{
 			this->pos.y = MIN_POSITION_Y + this->pos.dxdt * ticks - this->pos.dxdtdt * 0.5 * this->ticks * this->ticks;
 		}
+
 		printf("JUMP, tick:%u\n",this->ticks);
 	}
 	else  //Back to still
@@ -156,10 +211,10 @@ void Worm::WormJump() //Update caida no importa si estaempezando a saltar o cont
 
 bool Worm::check4motion()
 {
-	bool isOk = false;
-	if (this->wormDir == RIGHT && this->pos.x < MAX_POSITION_X)
+	bool isOk = false;			//Si es false NO tenemos q voltear a worm
+	if ((this->wormDir == RIGHT) && (this->pos.x > MAX_POSITION_X))
 		isOk = true;
-	if (this->wormDir == LEFT && this->pos.x > MIN_POSITION_X)
+	if ((this->wormDir == LEFT) && (this->pos.x < MIN_POSITION_X))
 		isOk = true;
 	
 	return isOk;
@@ -167,27 +222,38 @@ bool Worm::check4motion()
 
 void Worm::WormWalk()			//Aca verificar si tengo q cambiar sentido de direccion o no
 {
-	if (!check4motion())
+	if (check4motion())
 	{
 		this->wormDir *= -1;
 	}
 
+	if (this->ticks >= (CANT_IMAGES_WALK-1))
+	{
+		this->ticks = 0;
+	}
+
 	this->pos.x += this->wormDir * this->pos.dxdt;
-	printf("WALK\n");
+
+	printf("WALK, ticks:%u\n",this->ticks);
+	this->iveBeenWalking4 += 1;
 
 }
 void Worm::WormPreWalk()
 {
 	this->state = PREMOVE;
-
+	this->ticks = 0;
+	this->preWalkticks = 0;
 	//SET TIMER TO 0 
-	printf("PRE WALK\n");
 }
 
 void Worm::WormNewFrame()
 {
-	this->ticks+= 1;				//NO ESTOY SEGURA SI ESTO ES LO QUE HACE REFRESH
-	//printf("New Frame\n");
+	if (this->state == PREMOVE)
+	{
+		this->preWalkticks += 1; 
+	}
+
+	this->ticks+= 1;				//NO ESTOY SEGURA SI ESTO ES LO QUE HACE REFRESH;
 }
 
 void Worm::WormStop()

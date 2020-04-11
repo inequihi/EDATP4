@@ -29,6 +29,8 @@ typedef struct
 
 enum States {STILL, JUMPING, WALKING, PREMOVE, LANDING, MAXSTATES};
 enum Keys {KEYJUMP, KEYLEFT, KEYRIGHT, REFRESH, NOKEY=-1};
+#define UP 1
+#define DOWN 2
 
 class Worm
 {
@@ -40,7 +42,7 @@ public:
 	void WormPreWalk();
 	void WormNewFrame();
 	void WormStop();
-	void fsm(int newevent);
+	void fsm(int newevent, int UP_OR_DOWN);
 	int turn_keycode_to_key(int keycode);
 	bool check4motion(void);
 
@@ -62,6 +64,8 @@ protected:
 	unsigned int wormDir;
 	position_t pos;
 	unsigned int ticks;
+	unsigned int preWalkticks; 
+	unsigned int iveBeenWalking4;
 
 };
 

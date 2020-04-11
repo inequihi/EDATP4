@@ -20,11 +20,11 @@ public:
 	bool AllegroInit(void);
 	void printState(int state_flag, int tick, double pos_X, double pos_Y, int direccion);
 	ALLEGRO_DISPLAY* display;
+	ALLEGRO_BITMAP* background;
 
 protected:
 	
 	ALLEGRO_EVENT_QUEUE* eventqueue;
-	ALLEGRO_BITMAP* background;
 	ALLEGRO_BITMAP* imJump[CANT_IMAGES_JUMP];
 	ALLEGRO_BITMAP* imWalk[CANT_IMAGES_WALK];
 	bool all_ok;
