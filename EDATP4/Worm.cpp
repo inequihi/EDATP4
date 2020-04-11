@@ -260,7 +260,7 @@ void Worm::WormLanding()
 	{
 		this->ticks = 0;
 		this->state = STILL;
-		this->pos.dxdt = 0,54;
+		this->pos.dxdt = 0.54;
 		this->pos.y = MIN_POSITION_Y;
 		printf("END JUMP\n");
 	}
