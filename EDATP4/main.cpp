@@ -76,7 +76,10 @@ void dispatch(Evento evento, Simulation* sim, Worm* wormArray, Graph* grapher)
 			case TIMER:
 				sim->refresh(wormArray);	
 				int j;
-				al_draw_bitmap(grapher->background, 0, 0, 0);
+				al_clear_to_color(al_map_rgb(0, 0, 0));
+				al_draw_scaled_bitmap(grapher->background, 0, 0, al_get_bitmap_width(grapher->background), al_get_bitmap_height(grapher->background), 0, 0, SIZE_SCREEN_X, SIZE_SCREEN_Y, 0);
+
+	//			al_draw_bitmap(grapher->background, 0, 0, 0);
 				for (j = 0; j < NUMBER_OF_WORMS; j++)
 				{
 					grapher->printState(wormArray[j].getState(),wormArray[j].getTick(), wormArray[j].getPosX(), wormArray[j].getPosY(), wormArray[j].getDireccion());

@@ -85,7 +85,7 @@ bool Graph::loadImages(void)
 		printf("ERROR loading background");
 		return false;
 	}
-	al_draw_bitmap(background, 0, 0, 0);
+	al_draw_scaled_bitmap(background,0, 0, al_get_bitmap_width(background), al_get_bitmap_height(background),0 ,0 ,SIZE_SCREEN_X, SIZE_SCREEN_Y ,0);
 
 	//Cargamos las imagenes de salto
 	string str = "wjump\\wjump-F";
@@ -127,8 +127,14 @@ void Graph::printState(int state_flag, int tick, double pos_X, double pos_Y, int
 		al_draw_bitmap(imWalk[tick], pos_X, pos_Y, flag);			//si esta quieto tick seria cero
 		break;
 
+	case PREJUMP_G:
+		break;
 	case JUMPING_G:
-		al_draw_bitmap(imJump[tick], pos_X, pos_Y, flag);			
+		al_draw_bitmap(imJump[5], pos_X, pos_Y, flag);			
+		break;
+
+	case LANDING_G:
+		al_draw_bitmap(imJump[tick], pos_X, pos_Y, flag);
 		break;
 
 	case WALKING_G:

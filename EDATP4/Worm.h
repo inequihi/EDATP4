@@ -12,15 +12,17 @@ typedef struct
 {
 	double x;
 	double y;
-	double dxdt;		//velocidad
-	double dxdtdt;			//aceleracion
-	int wormDir;				//direccion
+	double prev_x;
+	float dxdt;		//velocidad
+	float dxdtdt;			//aceleracion
+	double wormDir;				//direccion
+	double angle;
 }position_t;
 
 typedef unsigned int EVENTO;
 typedef unsigned int ESTADO;
 
-enum States {STILL, JUMPING, WALKING, PREMOVE, LANDING, MAXSTATES};
+enum States {STILL, JUMPING, WALKING, PREWALK, LANDING, PREJUMP, MAXSTATES};
 enum Keys {KEYJUMP, KEYLEFT, KEYRIGHT, REFRESH, NOKEY=-1};
 #define UP 1
 #define DOWN 2
@@ -34,7 +36,8 @@ public:
 	void WormWalk();
 	void WormPreWalk();
 	void WormNewFrame();
-	void WormStop();
+	void WormLanding();
+	void WormPreJump();
 	void fsm(int newevent, int UP_OR_DOWN);
 	int turn_keycode_to_key(int keycode);
 	bool check4motion(void);
@@ -58,6 +61,7 @@ protected:
 	unsigned int ticks;
 	unsigned int preWalkticks; 
 	unsigned int iveBeenWalking4;
+	unsigned int iveBeenJumping4;
 
 };
 

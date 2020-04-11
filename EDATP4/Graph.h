@@ -9,7 +9,7 @@
 
 
 using namespace std;
-enum graphStates { STILL_G, JUMPING_G, WALKING_G, PREMOVE_G, LANDING_G, MAXSTATES_G };
+enum graphStates { STILL_G, JUMPING_G, WALKING_G, PREMOVE_G, LANDING_G, PREJUMP_G, MAXSTATES_G };
 
 class Graph
 {
