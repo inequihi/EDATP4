@@ -49,6 +49,9 @@ double Worm::getPosX(void) {return pos.x;}
 double Worm::getPosY(void) { return pos.y; }
 int Worm::getDireccion(void) { return pos.wormDir; }
 
+/************************
+*   Funciones publicas	*
+*************************/
 void Worm::fsm(int keycode, int UP_OR_DOWN)
 {
 	EVENTO key_evento = turn_keycode_to_key(keycode);
@@ -183,22 +186,24 @@ void Worm::fsm(int keycode, int UP_OR_DOWN)
 	}
 }
 
-
-int Worm::turn_keycode_to_key(int keycode)
+void Worm::WormNewFrame()
 {
-	int key = -1;
-	if (keycode == keyJump)
-		key = KEYJUMP;
-	else if (keycode == keyLeft)
-		key = KEYLEFT;
-	else if (keycode == keyRight)
-		key = KEYRIGHT;
-	else if (keycode == REFRESH)
-		key = REFRESH;
+	if (this->state == PREWALK)
+	{
+		this->preWalkticks += 1;
+	}
+	if (this->state == JUMPING || this->state == PREJUMP)
+	{
+		this->iveBeenJumping4 += 1;
+	}
 
-	return key;
+	this->ticks += 1;
 }
 
+
+/************************
+*   funciones privadas	*
+*************************/
 void Worm::WormPreJump()
 {
 	if (this->ticks >= 0 && this->ticks <= 4)
@@ -222,8 +227,9 @@ void Worm::WormPreJump()
 		printf("END PREJUMP\n");
 	}
 }
-void Worm::WormJump() //Update caida no importa si estaempezando a saltar o continua en un salto
-							//con dx y dy, posx posy podemos retomar movimiento sin problema 
+
+void Worm::WormJump() //Update caida
+						
 {
 	if (this->pos.y <= MIN_POSITION_Y)
 	{
@@ -242,7 +248,7 @@ void Worm::WormJump() //Update caida no importa si estaempezando a saltar o cont
 	}
 	else //Go to landing
 	{
-		this->ticks = 5;
+		this->ticks = 6;
 		this->iveBeenJumping4 = 0;
 		this->state = LANDING;
 		this->pos.y = MIN_POSITION_Y;
@@ -252,7 +258,7 @@ void Worm::WormJump() //Update caida no importa si estaempezando a saltar o cont
 
 void Worm::WormLanding()
 {
-	if (this->ticks >= 5 && this->ticks <= 10)
+	if (this->ticks > 5 && this->ticks <= 10)
 	{
 		printf("LANDING, tick:%u, y:%f \n", this->ticks, this->pos.y);
 	}
@@ -267,26 +273,8 @@ void Worm::WormLanding()
 	
 }
 
-bool Worm::check4motion()
-{
-	bool isOk = false;			//Si devuelve false NO tenemos q cambiar direccion de worm
-	if (this->pos.wormDir == RIGHT && this->pos.x > MAX_POSITION_X)
-		isOk = true;
-	else if (this->pos.wormDir == LEFT && this->pos.x < MIN_POSITION_X)
-		isOk = true;
-	else if (this->pos.wormDir == 0)
-		isOk = true;
-	
-	return isOk;
-}
-
 void Worm::WormWalk()			//Aca verificar si tengo q cambiar sentido de direccion o no
 {
-	if (check4motion())
-	{
-		this->pos.wormDir *= -1;
-	}
-
 	if (this->ticks >= CANT_IMAGES_WALK)
 	{
 		this->ticks = 3;
@@ -301,24 +289,41 @@ void Worm::WormWalk()			//Aca verificar si tengo q cambiar sentido de direccion 
 
 void Worm::WormPreWalk()
 {
+	if (check4motion())
+	{
+		this->pos.wormDir *= -1;
+	}
 	this->state = PREWALK;
 	this->ticks = 0;
 	this->preWalkticks = 0;
 	//SET TIMER TO 0 
 }
 
-void Worm::WormNewFrame()
+int Worm::turn_keycode_to_key(int keycode)
 {
-	if (this->state == PREWALK)
-	{
-		this->preWalkticks += 1; 
-	}
-	if (this->state == JUMPING || this->state == PREJUMP)
-	{
-		this->iveBeenJumping4 += 1;
-	}
+	int key = -1;
+	if (keycode == keyJump)
+		key = KEYJUMP;
+	else if (keycode == keyLeft)
+		key = KEYLEFT;
+	else if (keycode == keyRight)
+		key = KEYRIGHT;
+	else if (keycode == REFRESH)
+		key = REFRESH;
 
-	this->ticks+= 1;		
+	return key;
 }
 
+bool Worm::check4motion()
+{
+	bool isOk = false;			//Si devuelve false NO tenemos q cambiar direccion de worm
+	if (this->pos.wormDir == RIGHT && this->pos.x > MAX_POSITION_X)
+		isOk = true;
+	else if (this->pos.wormDir == LEFT && this->pos.x < MIN_POSITION_X)
+		isOk = true;
+	else if (this->pos.wormDir == 0)
+		isOk = true;
+
+	return isOk;
+}
 

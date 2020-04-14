@@ -20,7 +20,7 @@ typedef struct
 typedef unsigned int EVENTO;
 typedef unsigned int ESTADO;
 
-enum States {STILL, JUMPING, WALKING, PREWALK, LANDING, PREJUMP, MAXSTATES};
+enum States {STILL, JUMPING, WALKING, PREWALK, LANDING, PREJUMP};
 enum Keys {KEYJUMP, KEYLEFT, KEYRIGHT, REFRESH, NOKEY=-1};
 #define UP 1
 #define DOWN 2
@@ -28,26 +28,27 @@ enum Keys {KEYJUMP, KEYLEFT, KEYRIGHT, REFRESH, NOKEY=-1};
 class Worm
 {
 public:
+	/****************
+	*  Constructores*
+	*****************/
 	Worm();
-	Worm(char, char, char);
-	void WormJump();
-	void WormWalk();
-	void WormPreWalk();
-	void WormNewFrame();
-	void WormLanding();
-	void WormPreJump();
-	void fsm(int newevent, int UP_OR_DOWN);
-	int turn_keycode_to_key(int keycode);
-	bool check4motion(void);
+	Worm(char keyup, char keyleft, char keyright);			//El constructor recibe los codigos para las tres teclas 
+										//que usara el worm.
+
+	/************************
+	*   Funciones publicas	*
+	*************************/
+	void fsm(int newevent, int UP_OR_DOWN);		//la maquina de estados
+	void WormNewFrame();		//el actualizador de estados que debe ser llamado por refresh
 
 	/****************
 	*   getters		*
 	*****************/
-	unsigned int getState(void);
-	unsigned int getTick(void);
-	double getPosX(void);
-	double getPosY(void);
-	int getDireccion(void);
+	unsigned int getState(void);		//devuelve estado de worm: STILL, JUMPING, WALKING, PREWALK, LANDING o PREJUMP
+	unsigned int getTick(void);			//devuelve ticks de worm
+	double getPosX(void);				//devuelve posicion en x 
+	double getPosY(void);				//devuelve posicion en y
+	int getDireccion(void);				//devuelve direccion: LEFT, RIGHT o 0 (no direccion)
 
 protected:
 	unsigned int state;
@@ -57,10 +58,42 @@ protected:
 	char keyRight;
 	position_t pos;
 	unsigned int ticks;
-	unsigned int preWalkticks; 
-	unsigned int iveBeenWalking4;
-	unsigned int iveBeenJumping4;
 
+
+private:
+/************************
+*   funciones de worms	*
+*************************/
+	//WormPreJump: Verifica direccion del salto, comienza a saltar hasta estar el worm estirado en posicion de salto
+				//cambia estado a JUMPING cuando termina etapa de despegue.
+	void WormPreJump();
+	//WormJump: Ya estando en el aire actualiza movimiento del worm en salto vertical o en tiro oblicuo
+				//cambia estado a LANDING cuando termino de saltar.
+	void WormJump();
+	//WormLanding: Espera hasta terminar de aterrizar en 5 ticks. 
+				//cambia estado a STILL cuando termino de aterrizar.
+	void WormLanding();
+	//WormWalk: Worm camina. 
+				//No cambia estado.
+	void WormWalk();
+	//WormPreWalk: actualiza direccion de movimiento e inicia contador de preWalkTicks. 
+				//Cambia estado a PREWALK.
+	void WormPreWalk();
+
+	//turn_keycode_to_key: traduce la tecla evento recivido a las teclas del worm. 
+				//devuelve -1 si tecla evento no pertenece al conjunto teclas del worm.
+				// devuelve codigo de tecla si pertenece al conjunto. Codigos: KEYJUMP KEYLEFT KEYRIGHT
+	int turn_keycode_to_key(int keycode);
+	//check4motion: verifica si se debe rotar al worm al llegar a los limites de movimiento en eje x
+				//devuelve true si debemos cambiar direccion del worm
+	bool check4motion(void);
+
+/************************
+*  variables privadas	*
+*************************/
+	unsigned int preWalkticks;			//contador pre caminata. Lo incrementa WormNewFrame() y lo analiza fsm(). Si llega a 4 comienza a moverse worm.
+	unsigned int iveBeenWalking4;		//contador druante caminata. Verifica los segundos que se mantiene presionada tecla durante caminata.
+	unsigned int iveBeenJumping4;		//contador durante salto para calcular posicion de worm en tiro oblicuo. 
 };
 
 #endif

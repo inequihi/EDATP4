@@ -132,33 +132,34 @@ bool Graph::loadImages(void)
 	return true;
 }
 
+/*En cada refresh (cada 20ms) imprimiremos el estado de los worms*/
 void Graph::printState(int state_flag, int tick, double pos_X, double pos_Y, int direccion)
 {
 	int flag = checkOrientacion(direccion);
 	switch (state_flag)
 	{
-	case STILL_G:
-		al_draw_bitmap(imWalk[tick], pos_X, pos_Y, flag);		
-		break;
-
-	case PREJUMP_G:
-		al_draw_bitmap(imJump[tick], pos_X, pos_Y, flag);
-		break;
-
-	case JUMPING_G:
-		al_draw_bitmap(imJump[5], pos_X, pos_Y, flag);			
-		break;
-
-	case LANDING_G:
-		al_draw_bitmap(imJump[tick], pos_X, pos_Y, flag);
+	case STILL_G:											//Tanto quieto o moviendose se imprime una imagen del arreglo wwalk														
+		al_draw_bitmap(imWalk[tick], pos_X, pos_Y, flag);		//separamos los trees estados para mayor claridad
 		break;
 
 	case WALKING_G:
-		al_draw_bitmap(imWalk[tick], pos_X, pos_Y, flag);			
+		al_draw_bitmap(imWalk[tick], pos_X, pos_Y, flag);
 		break;
 
 	case PREMOVE_G:
-		al_draw_bitmap(imWalk[tick], pos_X, pos_Y, flag);			
+		al_draw_bitmap(imWalk[tick], pos_X, pos_Y, flag);
+		break;
+
+	case PREJUMP_G:				//En prejump se imprimiran las primeras 4 imagenes del salto
+		al_draw_bitmap(imJump[tick], pos_X, pos_Y, flag);
+		break;
+
+	case JUMPING_G:				//En el salto el worm esta estirado por lo que siempre se imprime la misma imagen
+		al_draw_bitmap(imJump[5], pos_X, pos_Y, flag);			
+		break;
+
+	case LANDING_G:				//En landing se imprimen las ultimas 5 imagenes (se comprime al aterrizar)
+		al_draw_bitmap(imJump[tick], pos_X, pos_Y, flag);
 		break;
 	default:
 		break;
@@ -170,7 +171,7 @@ int Graph::checkOrientacion(int direccion)
 {
 	if (direccion > 0)		//si va para la derecha
 	{
-		return ALLEGRO_FLIP_HORIZONTAL;
+		return ALLEGRO_FLIP_HORIZONTAL;		//damos vuelta la imagen
 	}
 	else
 		return 0;
