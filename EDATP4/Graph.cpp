@@ -79,7 +79,7 @@ bool Graph::createDisplay(void)
 bool Graph::loadImages(void)
 {
 	//Cargamos el fondo
-	if (!(background = al_load_bitmap("jardin.jpg")))				//Cambiemos este fondo o editemos el otro
+	if (!(background = al_load_bitmap("Scenario.png")))				//Cambiemos este fondo o editemos el otro
 																		//Pasa q Scenario no tiene fondo y cuando se imprime devuelta no despaarecen los worms
 	{
 		printf("ERROR loading background");
@@ -128,7 +128,9 @@ void Graph::printState(int state_flag, int tick, double pos_X, double pos_Y, int
 		break;
 
 	case PREJUMP_G:
+		al_draw_bitmap(imJump[tick], pos_X, pos_Y, flag);
 		break;
+
 	case JUMPING_G:
 		al_draw_bitmap(imJump[5], pos_X, pos_Y, flag);			
 		break;

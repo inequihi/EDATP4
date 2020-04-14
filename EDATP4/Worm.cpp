@@ -287,7 +287,7 @@ void Worm::WormWalk()			//Aca verificar si tengo q cambiar sentido de direccion 
 		this->pos.wormDir *= -1;
 	}
 
-	if (this->ticks >= (CANT_IMAGES_WALK-1))
+	if (this->ticks >= CANT_IMAGES_WALK)
 	{
 		this->ticks = 0;
 	}
