@@ -87,6 +87,8 @@ private:
 	//check4motion: verifica si se debe rotar al worm al llegar a los limites de movimiento en eje x
 				//devuelve true si debemos cambiar direccion del worm
 	bool check4motion(void);
+	//WormPhysics: calcula el tiro oblicuo del worm. Se llama en WormPreJump y WormJump
+	void WormJumpCalculations(void);
 
 /************************
 *  variables privadas	*

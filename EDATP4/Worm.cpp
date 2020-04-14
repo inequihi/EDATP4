@@ -208,17 +208,7 @@ void Worm::WormPreJump()
 {
 	if (this->ticks >= 0 && this->ticks <= 4)
 	{
-		if (check4motion())		//si esta en el borde salta para arriba  o cae
-		{
-			this->pos.wormDir = 0;
-		}
-
-		this->pos.x = this->pos.prev_x + this->pos.wormDir * cos(pos.angle) * pos.dxdt * this->iveBeenJumping4;			//4,5 es la velocidad de salto
-		this->pos.prev_x = this->pos.x;
-		if (this->pos.y <= MIN_POSITION_Y)		//Eje en alegro es alreves por eso si es mas chico q base esta saltando
-		{
-			this->pos.y = MIN_POSITION_Y - this->pos.dxdt * sin(pos.angle) * this->iveBeenJumping4 + this->pos.dxdtdt * 0.5 * this->iveBeenJumping4 * this->iveBeenJumping4;
-		}
+		WormJumpCalculations();
 		printf("PRE JUMP, tick:%u, y:%f \n", this->ticks, this->pos.y);
 	}
 	else //Go to jump
@@ -233,17 +223,7 @@ void Worm::WormJump() //Update caida
 {
 	if (this->pos.y <= MIN_POSITION_Y)
 	{
-		if (check4motion())		//si esta en el borde salta para arriba  o cae
-		{
-			this->pos.wormDir = 0;
-		}
-
-		this->pos.x = this->pos.prev_x + this->pos.wormDir * cos(pos.angle) * this->pos.dxdt;			//4,5 es la velocidad de salto 
-		this->pos.prev_x = this->pos.x;
-		if (this->pos.y <= MIN_POSITION_Y)		//Eje en alegro es alreves por eso si es mas chico q base esta saltando
-		{
-			this->pos.y = MIN_POSITION_Y - this->pos.dxdt * sin(pos.angle) * this->iveBeenJumping4 + this->pos.dxdtdt * 0.5 * this->iveBeenJumping4 * this->iveBeenJumping4;
-		}								//velocidad en y es negativa
+		WormJumpCalculations();
 		printf("JUMP, tick ive been jumping:%u,x:%f  y:%f \n",this->iveBeenJumping4, this->pos.x, this->pos.y);
 	}
 	else //Go to landing
@@ -256,6 +236,20 @@ void Worm::WormJump() //Update caida
 	}
 }
 
+void Worm::WormJumpCalculations()
+{
+	if (check4motion())		//si esta en el borde salta para arriba  o cae
+	{
+		this->pos.wormDir = 0;
+	}
+
+	this->pos.x = this->pos.prev_x + this->pos.wormDir * cos(pos.angle) * this->pos.dxdt;			//4,5 es la velocidad de salto 
+	this->pos.prev_x = this->pos.x;
+	if (this->pos.y <= MIN_POSITION_Y)		//Eje en alegro es alreves por eso si es mas chico q base esta saltando
+	{
+		this->pos.y = MIN_POSITION_Y - this->pos.dxdt * sin(pos.angle) * this->iveBeenJumping4 + this->pos.dxdtdt * 0.5 * this->iveBeenJumping4 * this->iveBeenJumping4;
+	}								//velocidad en y es negativa
+}
 void Worm::WormLanding()
 {
 	if (this->ticks > 5 && this->ticks <= 10)
@@ -280,6 +274,11 @@ void Worm::WormWalk()			//Aca verificar si tengo q cambiar sentido de direccion 
 		this->ticks = 3;
 	}
 
+	if (check4motion())
+	{
+		this->pos.wormDir *= -1;
+	}
+
 	this->pos.x = this->pos.prev_x + this->pos.wormDir * this->pos.dxdt;
 	this->pos.prev_x = this->pos.x;
 
@@ -293,6 +292,7 @@ void Worm::WormPreWalk()
 	{
 		this->pos.wormDir *= -1;
 	}
+
 	this->state = PREWALK;
 	this->ticks = 0;
 	this->preWalkticks = 0;
