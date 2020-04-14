@@ -13,7 +13,7 @@ void dispatch(Evento evento, Simulation* sim, Worm* wormArray, Graph* grapher);
 
 int main(void)
 {
-	//creo los punteros a los objetos y los objetos en si
+	//creo los punteros a los objetos y los objetos en si/
 	Graph* grapher = NULL;
 	EventGen* eventGen = NULL;
 	Simulation sim;
