@@ -21,14 +21,14 @@ Worm::Worm()
 
 Worm::Worm(char keyJump_, char keyLeft_, char keyRight_)
 {
-	pos.x = MIN_POSITION_X + static_cast <double> (rand()) / (static_cast <double> (RAND_MAX / (MAX_POSITION_X - MIN_POSITION_X)));
+	pos.x = MIN_POSITION_X + static_cast <double> (rand()) / (static_cast <double> (RAND_MAX) / (MAX_POSITION_X - MIN_POSITION_X));
 	pos.prev_x = pos.x;
 	pos.y = MIN_POSITION_Y; 
 	keyJump = keyJump_;
 	keyLeft = keyLeft_;
 	keyRight = keyRight_;
 	pos.dxdt = 0.54;			//Se mueve de a 27 pixeles por segundo -> 0,54 pixeles por 0,02 segundos (refresh)
-	pos.dxdtdt = 0.24;				//Aceleracion por fuerza de gravedad es positiva por los ejes que impone alegro
+	pos.dxdtdt = ACELERACION;				//Aceleracion por fuerza de gravedad es positiva por los ejes que impone alegro
 	pos.wormDir = 0;
 	pos.angle = PI / 3;				//60 grados
 	state = STILL;
@@ -289,7 +289,7 @@ void Worm::WormWalk()			//Aca verificar si tengo q cambiar sentido de direccion 
 
 	if (this->ticks >= CANT_IMAGES_WALK)
 	{
-		this->ticks = 0;
+		this->ticks = 3;
 	}
 
 	this->pos.x = this->pos.prev_x + this->pos.wormDir * this->pos.dxdt;

@@ -5,27 +5,40 @@ Graph::Graph()
 	display = NULL;
 	eventqueue = NULL;
 	all_ok = true;
-	
+	//llamamos a una funcion que inicializa e instala las cosas necesarias de allegro y si no pudo inicializarlas lo indica con all_ok
 	if (!AllegroInit())
 	{
 		all_ok = false;
 	}
 }
 
-void Graph::destroy()
+
+/* El destructor de graph se encarga de eliminar todas las imagenes y displays creados, al salir del programa*/
+Graph::~Graph()
 {
 	if (background)
 		al_destroy_bitmap(background);	
 	if(display)
 		al_destroy_display(display);
+	for (int i = 0; i < CANT_IMAGES_JUMP; i++)
+	{
+		if (imJump[i])
+			al_destroy_bitmap(imJump[i]);
+	}
+	for (int i = 0; i < CANT_IMAGES_WALK; i++)
+	{
+		if (imWalk[i])
+			al_destroy_bitmap(imWalk[i]);
+	}
 }
 
+//es un getter que te devuelve el estado de all_ok
 bool Graph::wasGood(void)
 {
 	return all_ok;
 }
 
-
+//se encarga de instalar e inicializar todas las imagenes y cosas de allegro.
 bool Graph::AllegroInit()
 {
 	if(al_init())
@@ -65,7 +78,6 @@ bool Graph::AllegroInit()
 	else
 		printf("ERROR al_init\n");
 	return false;
-
 }
 
 bool Graph::createDisplay(void)
@@ -76,18 +88,20 @@ bool Graph::createDisplay(void)
 	return true;
 }
 
+/*Esta funcion carga todas las imagenes en memoria */
 bool Graph::loadImages(void)
 {
 	//Cargamos el fondo
-	if (!(background = al_load_bitmap("Scenario.png")))				//Cambiemos este fondo o editemos el otro
-																		//Pasa q Scenario no tiene fondo y cuando se imprime devuelta no despaarecen los worms
-	{
+	if (!(background = al_load_bitmap("Scenario.png")))				
+	{																	
 		printf("ERROR loading background");
 		return false;
 	}
+	//imprime la imegen.
 	al_draw_scaled_bitmap(background,0, 0, al_get_bitmap_width(background), al_get_bitmap_height(background),0 ,0 ,SIZE_SCREEN_X, SIZE_SCREEN_Y ,0);
 
-	//Cargamos las imagenes de salto
+
+	//Cargamos las imagenes de salto, para eso en direccion ponemos el nombre de la direccion segun el numero de imagen a cargar.
 	string str = "wjump\\wjump-F";
 	string direccion;
 	for (int i = 0; i < CANT_IMAGES_JUMP; i++)
@@ -101,7 +115,7 @@ bool Graph::loadImages(void)
 		}
 	}
 
-	//Cargamos las imagenes de caminata
+	//Cargamos las imagenes de caminata, para eso en direccion ponemos el nombre de la direccion segun el numero de imagen a cargar.
 	string direct = "wwalking\\wwalk-F";
 	string completeDireccion;
 	for (int i = 0; i < CANT_IMAGES_WALK; i++)
@@ -124,7 +138,7 @@ void Graph::printState(int state_flag, int tick, double pos_X, double pos_Y, int
 	switch (state_flag)
 	{
 	case STILL_G:
-		al_draw_bitmap(imWalk[tick], pos_X, pos_Y, flag);			//si esta quieto tick seria cero
+		al_draw_bitmap(imWalk[tick], pos_X, pos_Y, flag);		
 		break;
 
 	case PREJUMP_G:
@@ -144,7 +158,7 @@ void Graph::printState(int state_flag, int tick, double pos_X, double pos_Y, int
 		break;
 
 	case PREMOVE_G:
-		al_draw_bitmap(imWalk[tick], pos_X, pos_Y, flag);			//si esta en premove tick seria cero
+		al_draw_bitmap(imWalk[tick], pos_X, pos_Y, flag);			
 		break;
 	default:
 		break;

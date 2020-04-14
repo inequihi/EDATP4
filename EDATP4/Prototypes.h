@@ -4,10 +4,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #define NUMBER_OF_WORMS 2
-#define SIZE_SCREEN_X 1612
-#define MIN_POSITION_X 200
+#define ACELERACION 0.24
+#define SIZE_SCREEN_X 1920
+#define MIN_POSITION_X 711
 #define MAX_POSITION_X 1212
-#define SIZE_SCREEN_Y 900
+#define SIZE_SCREEN_Y 696
 #define MIN_POSITION_Y 616
 #define CANT_IMAGES_JUMP 10
 #define CANT_IMAGES_WALK 15

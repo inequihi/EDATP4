@@ -15,7 +15,7 @@ class Graph
 {
 public:
 	Graph();
-	void destroy(void);
+	~Graph();
 	bool wasGood(void);
 	bool AllegroInit(void);
 	void printState(int state_flag, int tick, double pos_X, double pos_Y, int direccion);

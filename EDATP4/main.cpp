@@ -6,43 +6,57 @@
 #include "Graph.h"
 #include "Worm.h"
 
+//Funciones de main
 bool initialize(Graph** grapher, EventGen** eventgen);
 void deinit(Graph** grapher, EventGen** eventgen);
 void dispatch(Evento evento, Simulation* sim, Worm* wormArray, Graph* grapher);
 
 int main(void)
 {
+	//creo los punteros a los objetos y los objetos en si
 	Graph* grapher = NULL;
 	EventGen* eventGen = NULL;
 	Simulation sim;
 	Worm worm[NUMBER_OF_WORMS];
 
+	//inicializo los comandos para cada worm creado, si se quisiera trabajar con mas worms aqui deberian inicializarse tambien con dif teclas
 	worm[0] = Worm(ALLEGRO_KEY_UP, ALLEGRO_KEY_LEFT, ALLEGRO_KEY_RIGHT);
 	worm[1] = Worm(ALLEGRO_KEY_W, ALLEGRO_KEY_A, ALLEGRO_KEY_D);
 
+	//inicializo todas las cosas de allegro
 	if (!(initialize(&grapher, &eventGen)))
 	{
 		printf("Error de inicializacion");
 		return -1;
 	}
+	//siempre que no se detecte el evento de quit (al presionar x en el display)
 	while (sim.running())
 	{
 		if (eventGen->hayEvento())
 		{
-			dispatch(eventGen->getEvento(), &sim,worm, grapher);
+			// dispatch llama a la funcion correspondiente de sim segun el tipo de evento que recibe
+			dispatch(eventGen->getEvento(), &sim,worm, grapher); 
 		}
 	}
+	//borra todas las cosas de alegro relacionadas a la parte grapher y a la parte eventGen
 	deinit(&grapher, &eventGen);
 	return 0;
 }
 
+
+/*Esta funcion se encarga de inicializar allegro tanto la parte grafica como la parte de eventos,
+se le pasa un puntero doble ya que quiero modificar la variable a la que apunta el puntero*/
 bool initialize(Graph** grapher,EventGen ** eventGen)
 {
+
 	*grapher = new Graph();
 	if (!*grapher)
 		return false;
 	*eventGen = new EventGen((*grapher)->display);
+	if (!*eventGen)
+		return false;
 
+	//llamo a las funciones que corroboran que en la inicializacion de los componentes todo estuvo bien
 	if (!(*grapher)->wasGood() || !(*eventGen)->wasGood())
 	{
 		return false;
@@ -50,9 +64,14 @@ bool initialize(Graph** grapher,EventGen ** eventGen)
 	return true;
 }
 
+/*Esta funcion se encarga de borrar todas las cosas inicializadas por allegro*/
 void deinit(Graph** grapher, EventGen** eventgen)
 {
-	delete *eventgen;
+	if (*eventgen)
+	{
+		delete* eventgen;
+		*eventgen = NULL;
+	}
 	if (*grapher)
 	{
 		delete* grapher;
@@ -60,7 +79,7 @@ void deinit(Graph** grapher, EventGen** eventgen)
 	}
 }
 
-
+/*Esta funcion se encarga de llamar a la funcion correspondiente de sis segun el tipo de evento que recibe de la cola de eventos */
 void dispatch(Evento evento, Simulation* sim, Worm* wormArray, Graph* grapher)
 {
 		switch (evento.getType())
@@ -78,8 +97,6 @@ void dispatch(Evento evento, Simulation* sim, Worm* wormArray, Graph* grapher)
 				int j;
 				al_clear_to_color(al_map_rgb(0, 0, 0));
 				al_draw_scaled_bitmap(grapher->background, 0, 0, al_get_bitmap_width(grapher->background), al_get_bitmap_height(grapher->background), 0, 0, SIZE_SCREEN_X, SIZE_SCREEN_Y, 0);
-
-	//			al_draw_bitmap(grapher->background, 0, 0, 0);
 				for (j = 0; j < NUMBER_OF_WORMS; j++)
 				{
 					grapher->printState(wormArray[j].getState(),wormArray[j].getTick(), wormArray[j].getPosX(), wormArray[j].getPosY(), wormArray[j].getDireccion());

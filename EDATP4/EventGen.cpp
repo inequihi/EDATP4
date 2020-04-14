@@ -8,20 +8,23 @@ EventGen::EventGen(ALLEGRO_DISPLAY* display)
 	event_queue = al_create_event_queue();
 	timer = al_create_timer(1.0 / FPS);
 
-	if (!event_queue || !timer)				//elimino !al_install_keyboard() de la ocndicion para q esto se haga en graph class init
+	//si el event queue o el timer no pudieron ser inicializados error
+	if (!event_queue || !timer)	
 	{
 		ev_ok = false;
-		printf("ERROR with event_queue || timer\n");
+		printf("ERROR con event_queue o timer\n");
 	}
 	else
 	{
+		//tomo todos los eventos que me interesan.
 		al_register_event_source(event_queue, al_get_display_event_source(display));
 		al_register_event_source(event_queue, al_get_timer_event_source(timer));
 		al_register_event_source(event_queue, al_get_keyboard_event_source());
-		al_start_timer(timer);  //revisar si se pone aca o donde se pondria
+		al_start_timer(timer); 
 	}
 }
 
+/*destruyo todo lo creado en esta clase por parte de allegro.*/
 EventGen::~EventGen()
 {
 	if (event_queue)
@@ -38,11 +41,7 @@ EventGen::~EventGen()
 				
 }
 
-bool EventGen::hayEvento()
-{
-	return !al_is_event_queue_empty(event_queue);
-}
-
+//esta funcion evalua el evento siguiente en la cola de eventos, lo configura en el objeto evento y devuelve dicho evento ya configurado segun el ultimo elemento de la pila.
 Evento EventGen::getEvento()
 {
 	ALLEGRO_EVENT ev;
@@ -67,8 +66,18 @@ Evento EventGen::getEvento()
 	return evento;
 }
 
+/*******************************************
+*			GETTERS							*
+********************************************/
 
+//getter que indica si todo fue bien 
 bool EventGen::wasGood(void)
 {
 	return ev_ok;
+}
+
+//Es un getter que retorna el estado de la pila, si hay elemento devuelve true sino false.
+bool EventGen::hayEvento()
+{
+	return !al_is_event_queue_empty(event_queue);
 }
