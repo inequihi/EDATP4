@@ -27,8 +27,8 @@ Worm::Worm(char keyJump_, char keyLeft_, char keyRight_)
 	keyJump = keyJump_;
 	keyLeft = keyLeft_;
 	keyRight = keyRight_;
-	pos.dxdt = 0.54;			//Se mueve de a 27 pixeles por segundo -> 0,54 pixeles por 0,02 segundos (refresh)
-	pos.dxdtdt = ACELERACION;				//Aceleracion por fuerza de gravedad es positiva por los ejes que impone alegro
+	pos.dxdt = (float)0.54;			//Se mueve de a 27 pixeles por segundo -> 0,54 pixeles por 0,02 segundos (refresh)
+	pos.dxdtdt = (float)ACELERACION;				//Aceleracion por fuerza de gravedad es positiva por los ejes que impone alegro
 	pos.wormDir = 0;
 	pos.angle = PI / 3;				//60 grados
 	state = STILL;

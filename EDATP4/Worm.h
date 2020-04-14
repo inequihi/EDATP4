@@ -2,8 +2,6 @@
 #define WORM_H
 
 #include "Prototypes.h"
-#include "Graph.h"
-
 #define LEFT -1
 #define RIGHT 1
 #define PI 3.14159265
